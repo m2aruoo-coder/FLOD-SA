@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FLOD | كويز الأكل الصحي</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffffff;--ink:#1c0d0f;--coffee:#c4161f;--soft:#fbeaea;--line:#efd0d1;--ok:#2f7d4f;--bad:#2a070a;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#140a0b;--ink:#f6e8e8;--coffee:#ff7078;--soft:#221214;--line:#432529}}
+:root[data-theme="dark"]{--bg:#140a0b;--ink:#f6e8e8;--coffee:#ff7078;--soft:#221214;--line:#432529}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Tajawal,Tahoma,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:3px solid var(--coffee);outline-offset:3px}
+.hero{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;color:#fff;background:radial-gradient(ellipse at 50% 30%,#e23a44 0,#a3151f 55%,#3b060b 100%);padding:calc(22px + env(safe-area-inset-top,0px)) 5vw calc(4vh + env(safe-area-inset-bottom,0px))}
+.logo{font-family:Archivo,sans-serif;font-weight:800;letter-spacing:.3em;text-align:center;direction:ltr}
+.stage{display:grid;place-items:center;text-align:center;padding:4vh 0}
+.panel{width:min(640px,100%)}
+.big{position:absolute;inset:auto 0 3vh;text-align:center;font-family:Archivo,sans-serif;font-weight:800;font-size:clamp(7rem,34vw,26rem);line-height:.8;color:rgba(255,255,255,.07);pointer-events:none;direction:ltr}
+.stage,.panel{position:relative;z-index:1}
+h1{font-size:clamp(2rem,6vw,3.4rem);line-height:1.25;margin-bottom:12px}
+.sub{opacity:.8;margin-bottom:28px}
+.btn{background:#fff;color:#a3151f;border:0;border-radius:999px;padding:13px 38px;font-weight:700;font-size:1.05rem}
+.q{font-size:clamp(1.3rem,4vw,1.9rem);font-weight:700;margin:16px 0 22px;line-height:1.5}
+.meta{display:flex;justify-content:space-between;opacity:.85;font-size:.95rem}
+.bar{height:5px;background:rgba(255,255,255,.2);border-radius:9px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:#fff;width:100%;transition:width 1s linear}
+.opts{display:grid;gap:10px}
+.opt{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.35);border-radius:14px;padding:14px 18px;text-align:start;font-size:1.05rem;color:#fff;backdrop-filter:blur(6px)}
+.opt:hover:not(:disabled){background:rgba(255,255,255,.2)}
+.opt.ok{background:var(--ok);border-color:var(--ok)}
+.opt.no{background:var(--bad);border-color:var(--bad)}
+.code{display:inline-block;direction:ltr;font-family:Archivo,sans-serif;font-weight:800;font-size:2.2rem;letter-spacing:.2em;border:2px dashed #fff;border-radius:14px;padding:10px 26px;margin:10px 0 24px}
+.foot{text-align:center;font-size:.85rem;opacity:.6}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="logo">FLOD</div>
+  <div class="stage"><div class="panel" id="p" aria-live="polite"></div></div>
+  <div class="big" aria-hidden="true">FLOD</div>
+  <div class="foot">لكل زبون محاولة واحدة في كل زيارة</div>
+</section>
+<script>
+var Q=[
+["أي من دول مصدر غني بالبروتين؟",["الدجاج","الأرز الأبيض","الخيار","الخس"],0],
+["أنهي زيت أصح للسلطة؟",["زيت الزيتون البكر","الزبدة","السمن الصناعي","زيت النخيل المهدرج"],0],
+["الألياف الغذائية مفيدة لـ؟",["الهضم","هدم العضلات","زيادة الجوع فقط","تقليل الماء"],0],
+["أكتر فيتامين موجود في البرتقال؟",["فيتامين C","فيتامين D","فيتامين K","فيتامين B12"],0],
+["مصدر فيتامين D الأساسي؟",["الشمس","الملح","السكر","الأرز"],0],
+["الكالسيوم مهم لـ؟",["العظام والأسنان","حاسة الشم","لون العين","الصوت"],0],
+["أنهي دول كربوهيدرات معقدة؟",["الشوفان","الحلوى","العصير المحلى","الكيك"],0],
+["أغنى مصدر لأوميجا 3؟",["السلمون","البطاطس","الأرز","الخبز الأبيض"],0],
+["الأفوكادو غني بـ؟",["دهون صحية","سكر مكرر","ملح زيادة","بروتين حيواني"],0],
+["كمية الماء اليومية المعتادة للبالغ تقريبًا؟",["حوالي 2 لتر","نص كوب","10 لتر","مش محتاج ماء"],0],
+["الحديد مهم لـ؟",["تكوين الهيموجلوبين","تقوية الشعر فقط","تحسين النظر فقط","حرق الدهون"],0],
+["السبانخ مشهورة بإنها غنية بـ؟",["الحديد","الكوليسترول","السكر المضاف","الدهون المهدرجة"],0],
+["أنهي دول سناك أقل صحة؟",["المقرمشات المقلية","التفاح","الزبادي","الجزر"],0],
+["الزبادي غني بـ؟",["البكتيريا النافعة","الكافيين","النيكوتين","السكر المكرر فقط"],0],
+["الموز غني بـ؟",["البوتاسيوم","فيتامين B12","الكوليسترول","الصوديوم"],0],
+["إيه اللي بيحسّن الشبع؟",["البروتين والألياف","السكر المكرر","المياه الغازية","الملح الزائد"],0],
+["الإفراط في السكر بيزود خطر؟",["السكري وزيادة الوزن","زيادة الطول","تحسن النظر","تقوية العظام"],0],
+["إفطار الأصح؟",["فول وبيض وخبز أسمر","مشروب غازي","حلويات","شيبسي"],0],
+["الخبز الأسمر مقارنة بالأبيض فيه؟",["ألياف أكتر","ألياف أقل","سكر أكتر","مفيش فرق"],0],
+["المكسرات بتوفر؟",["دهون صحية وبروتين","سكر فقط","ملح فقط","ماء فقط"],0],
+["أصح طريقة طبخ؟",["السلق أو الشوي","القلي العميق","القلي في زيت مستعمل","التحمير الزائد"],0],
+["الملح الزائد بيزود خطر؟",["ارتفاع ضغط الدم","زيادة الطول","تحسن السمع","تحسن النظر"],0],
+["الماء بيساعد في؟",["الترطيب ونقل العناصر","تدمير الفيتامينات","رفع الكوليسترول","زيادة السكر"],0],
+["أنهي أكلة غنية بفيتامين A؟",["الجزر","الأرز","المكرونة","السكر"],0],
+["الكوليسترول الجيد اسمه؟",["HDL","LDL","VLDL","TNT"],0],
+["البيض مصدر لـ؟",["بروتين كامل","ألياف فقط","سكر فقط","كوليسترول جيد فقط"],0],
+["العدس والحمص مصدر لـ؟",["بروتين نباتي وألياف","سكر مضاف","دهون مهدرجة","كافيين"],0],
+["الفاكهة الكاملة مقارنة بعصيرها؟",["فيها ألياف أكتر","فيها ألياف أقل","نفس الألياف","مفيهاش فيتامينات"],0],
+["الجلوكوز بيستخدمه الجسم كـ؟",["مصدر للطاقة","مصدر للون","مصدر للطول","مصدر للصوت"],0],
+["الأفضل في الخضار؟",["تنويع الأنواع والألوان","نوع واحد بس","تجنبها","قليها دايمًا"],0]
+];
+var T=15,qs,i,ok,t,tm,done,p=document.getElementById("p");
+function sh(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),x=a[k];a[k]=a[j];a[j]=x}return a}
+function start(){p.innerHTML='<h1>جاوب صح واكسب خصم 20%</h1><p class="sub">ثلاث أسئلة عن الأكل الصحي، ولكل سؤال 15 ثانية.</p><button class="btn" id="go">ابدأ</button>';document.getElementById("go").onclick=function(){qs=sh(Q).slice(0,3);i=0;ok=0;show()}}
+function show(){
+  var q=qs[i],o=sh(q[1].map(function(x,k){return{x:x,r:k==q[2]}}));done=false;t=T;
+  p.innerHTML='<div class="meta"><span>السؤال '+(i+1)+'</span><span id="s">'+T+'</span></div><div class="bar"><i id="b"></i></div><div class="q">'+q[0]+'</div><div class="opts">'+o.map(function(a,k){return '<button class="opt" data-r="'+(a.r?1:0)+'">'+a.x+'</button>'}).join("")+'</div>';
+  p.querySelector(".opts").onclick=function(e){if(!done&&e.target.dataset.r!==undefined)fin(e.target)};
+  tm=setInterval(function(){t--;document.getElementById("s").textContent=t;document.getElementById("b").style.width=(t/T*100)+"%";if(t<=0)fin(null)},1000);
+}
+function fin(btn){
+  done=true;clearInterval(tm);
+  var all=p.querySelectorAll(".opt");all.forEach(function(b){b.disabled=true;if(b.dataset.r=="1")b.classList.add("ok")});
+  var good=btn&&btn.dataset.r=="1";if(btn&&!good)btn.classList.add("no");
+  if(good)ok++;
+  setTimeout(function(){if(!good)return end();i++;i<3?show():end()},1100);
+}
+function end(){
+  if(ok==3){p.innerHTML='<h1>مبروك! جاوبت الكل صح</h1><p class="sub">ده كود خصم 20% ليك:</p><div class="code">FLOD20</div><br><button class="btn" id="cp">انسخ الكود</button>';document.getElementById("cp").onclick=function(){try{navigator.clipboard.writeText("FLOD20")}catch(e){}this.textContent="تم النسخ"}}
+  else{p.innerHTML='<h1>قربت!</h1><p class="sub">مجاوبتش الأسئلة كلها صح المرة دي. جرّب تاني بأسئلة جديدة.</p><button class="btn" id="go">حاول تاني</button>';document.getElementById("go").onclick=function(){qs=sh(Q).slice(0,3);i=0;ok=0;show()}}
+}
+start();
+</script>
+</body>
+</html>
